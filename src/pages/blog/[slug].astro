@@ -1,5 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
+import { Calendar, Camera, Clock, Network, PlayCircle, User } from "lucide-react";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export async function getStaticPaths() {
@@ -13,31 +14,56 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+
+function calculateReadingTime(body: string | undefined): string {
+  const words = body?.trim().split(/\s+/).filter(Boolean).length ?? 0;
+  return `${Math.max(1, Math.ceil(words / 200))} min`;
+}
 ---
 
 <BaseLayout title={`${post.data.title} | Blogar Style`} description={post.data.description}>
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#1a1a1a]/80 backdrop-blur-xl">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-background/80 backdrop-blur-xl">
     <div class="mx-auto flex max-w-4xl items-center justify-between px-4 py-4">
-      <a href="/" class="text-xl font-black text-white">Blogar<span class="text-cyan-400">Style</span></a>
-      <a href="/" class="rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10">
-        Voltar
-      </a>
+      <a href="/" class="text-xl font-black text-white">Blogar<span class="text-primary">Style</span></a>
+      <div class="flex items-center gap-2">
+        <a href="#" aria-label="Instagram" class="rounded-full p-2 hover:bg-white/10">
+          <Camera className="h-4 w-4 text-slate-400" aria-hidden="true" />
+        </a>
+        <a href="#" aria-label="YouTube" class="rounded-full p-2 hover:bg-white/10">
+          <PlayCircle className="h-4 w-4 text-slate-400" aria-hidden="true" />
+        </a>
+        <a href="#" aria-label="LinkedIn" class="rounded-full p-2 hover:bg-white/10">
+          <Network className="h-4 w-4 text-slate-400" aria-hidden="true" />
+        </a>
+        <a href="/" class="ml-2 rounded-full border border-white/10 px-4 py-2 text-sm font-bold text-slate-200 hover:bg-white/10">
+          Voltar
+        </a>
+      </div>
     </div>
   </header>
 
   <main class="mx-auto max-w-4xl px-4 py-12">
     <article>
-      <span class="inline-flex rounded-full bg-cyan-400 px-3 py-1 text-xs font-black uppercase tracking-wide text-slate-950">
+      <span class="inline-flex rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-wide text-slate-950">
         {post.data.category}
       </span>
       <h1 class="mt-5 text-4xl font-black leading-tight text-white sm:text-6xl">{post.data.title}</h1>
       <p class="mt-5 text-lg leading-8 text-slate-300">{post.data.description}</p>
-      <div class="mt-6 flex items-center gap-3 text-sm text-slate-400">
-        <span>{post.data.author}</span>
-        <span>•</span>
+      <div class="mt-6 flex flex-wrap items-center gap-4 text-sm text-slate-400">
+        <span class="inline-flex items-center gap-1.5">
+          <User className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          {post.data.author}
+        </span>
         <time datetime={post.data.pubDate.toISOString()}>
-          {post.data.pubDate.toLocaleDateString("pt-BR")}
+          <span class="inline-flex items-center gap-1.5">
+            <Calendar className="h-4 w-4 text-slate-400" aria-hidden="true" />
+            {post.data.pubDate.toLocaleDateString("pt-BR")}
+          </span>
         </time>
+        <span class="inline-flex items-center gap-1.5">
+          <Clock className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          {calculateReadingTime(post.body)}
+        </span>
       </div>
       <img
         src={post.data.image}

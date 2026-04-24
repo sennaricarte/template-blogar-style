@@ -1,5 +1,6 @@
 ---
 import { getCollection } from "astro:content";
+import { Calendar, Camera, Clock, Network, PlayCircle, Search, User } from "lucide-react";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
@@ -21,30 +22,33 @@ const categoryColors: Record<string, string> = {
 
 const getCategoryClass = (category: string) =>
   categoryColors[category] ?? "bg-slate-100 text-slate-950";
+
+function calculateReadingTime(body: string | undefined): string {
+  const words = body?.trim().split(/\s+/).filter(Boolean).length ?? 0;
+  return `${Math.max(1, Math.ceil(words / 200))} min`;
+}
 ---
 
 <BaseLayout
   title="Blogar Style | Revista digital moderna"
   description="Portal de notícias e revista digital em Astro, Tailwind CSS e Content Collections."
 >
-  <header class="sticky top-0 z-50 border-b border-white/10 bg-[#1a1a1a]/70 backdrop-blur-xl">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-background/70 backdrop-blur-xl">
     <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
       <a href="/" class="text-xl font-black tracking-tight text-white">
-        Blogar<span class="text-cyan-400">Style</span>
+        Blogar<span class="text-primary">Style</span>
       </a>
 
       <nav class="hidden items-center gap-6 text-sm font-semibold text-slate-300 md:flex">
-        <a href="#top-stories" class="hover:text-cyan-300">Top Stories</a>
-        <a href="#latest" class="hover:text-cyan-300">Últimas</a>
-        <a href="#newsletter" class="hover:text-cyan-300">Newsletter</a>
+        <a href="#top-stories" class="hover:text-primary">Top Stories</a>
+        <a href="#latest" class="hover:text-primary">Últimas</a>
+        <a href="#newsletter" class="hover:text-primary">Newsletter</a>
       </nav>
 
       <div class="flex items-center gap-3">
         <label class="hidden items-center rounded-full border border-white/10 bg-white/5 px-3 py-2 sm:flex">
           <span class="sr-only">Buscar</span>
-          <svg class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path d="M8.5 3a5.5 5.5 0 0 1 4.38 8.83l3.15 3.14-1.06 1.06-3.14-3.15A5.5 5.5 0 1 1 8.5 3Zm0 1.5a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
-          </svg>
+          <Search className="h-4 w-4 text-slate-400" aria-hidden="true" />
           <input
             type="search"
             placeholder="Buscar..."
@@ -52,8 +56,15 @@ const getCategoryClass = (category: string) =>
           />
         </label>
         <div class="hidden items-center gap-2 text-slate-300 sm:flex">
-          <a href="#" aria-label="Instagram" class="rounded-full p-2 hover:bg-white/10">IG</a>
-          <a href="#" aria-label="YouTube" class="rounded-full p-2 hover:bg-white/10">YT</a>
+          <a href="#" aria-label="Instagram" class="rounded-full p-2 hover:bg-white/10">
+            <Camera className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          </a>
+          <a href="#" aria-label="YouTube" class="rounded-full p-2 hover:bg-white/10">
+            <PlayCircle className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          </a>
+          <a href="#" aria-label="LinkedIn" class="rounded-full p-2 hover:bg-white/10">
+            <Network className="h-4 w-4 text-slate-400" aria-hidden="true" />
+          </a>
         </div>
       </div>
     </div>
@@ -62,7 +73,7 @@ const getCategoryClass = (category: string) =>
   <main>
     <section class="mx-auto max-w-7xl px-4 pb-12 pt-8 sm:px-6 lg:px-8 lg:pt-12">
       <div class="mb-8 max-w-3xl">
-        <p class="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-cyan-300">Revista digital</p>
+        <p class="mb-3 text-sm font-bold uppercase tracking-[0.3em] text-primary">Revista digital</p>
         <h1 class="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-7xl">
           Notícias, tendências e cultura para leitores modernos.
         </h1>
@@ -73,7 +84,7 @@ const getCategoryClass = (category: string) =>
           <div class="grid gap-5 lg:grid-cols-[1.55fr_1fr]">
             <a
               href={`/blog/${mainPost.slug}`}
-              class="group relative min-h-[520px] overflow-hidden rounded-3xl bg-[#242424] shadow-2xl shadow-black/30"
+              class="group relative min-h-[520px] overflow-hidden rounded-3xl bg-card shadow-2xl shadow-black/30"
             >
               <img
                 src={mainPost.data.image}
@@ -89,6 +100,20 @@ const getCategoryClass = (category: string) =>
                   {mainPost.data.title}
                 </h2>
                 <p class="mt-4 max-w-2xl text-base text-slate-200">{mainPost.data.description}</p>
+                <div class="mt-5 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-300">
+                  <span class="inline-flex items-center gap-1.5">
+                    <User className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                    {mainPost.data.author}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <Calendar className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                    {mainPost.data.pubDate.toLocaleDateString("pt-BR")}
+                  </span>
+                  <span class="inline-flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                    {calculateReadingTime(mainPost.body)}
+                  </span>
+                </div>
               </div>
             </a>
 
@@ -96,7 +121,7 @@ const getCategoryClass = (category: string) =>
               {heroSidePosts.map((post) => (
                 <a
                   href={`/blog/${post.slug}`}
-                  class="group relative min-h-[250px] overflow-hidden rounded-3xl bg-[#242424] shadow-xl shadow-black/20"
+                  class="group relative min-h-[250px] overflow-hidden rounded-3xl bg-card shadow-xl shadow-black/20"
                 >
                   <img
                     src={post.data.image}
@@ -109,6 +134,16 @@ const getCategoryClass = (category: string) =>
                       {post.data.category}
                     </span>
                     <h3 class="text-2xl font-black leading-tight text-white">{post.data.title}</h3>
+                    <div class="mt-3 flex items-center gap-3 text-xs text-slate-300">
+                      <span class="inline-flex items-center gap-1.5">
+                        <Calendar className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                        {post.data.pubDate.toLocaleDateString("pt-BR")}
+                      </span>
+                      <span class="inline-flex items-center gap-1.5">
+                        <Clock className="h-4 w-4 text-slate-400" aria-hidden="true" />
+                        {calculateReadingTime(post.body)}
+                      </span>
+                    </div>
                   </div>
                 </a>
               ))}
@@ -121,17 +156,17 @@ const getCategoryClass = (category: string) =>
     <section id="top-stories" class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div class="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p class="text-sm font-bold uppercase tracking-[0.3em] text-rose-400">Em destaque</p>
+          <p class="text-sm font-bold uppercase tracking-[0.3em] text-accent">Em destaque</p>
           <h2 class="mt-2 text-3xl font-black text-white">Top Stories</h2>
         </div>
-        <a href="#latest" class="rounded-full bg-cyan-400 px-5 py-2 text-sm font-black text-slate-950 hover:bg-cyan-300">
+        <a href="#latest" class="rounded-full bg-primary px-5 py-2 text-sm font-black text-slate-950 hover:opacity-90">
           Ver tudo
         </a>
       </div>
 
       <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {topStories.map((post) => (
-          <article class="group overflow-hidden rounded-2xl bg-[#242424] shadow-lg shadow-black/20">
+          <article class="group overflow-hidden rounded-2xl bg-card shadow-lg shadow-black/20">
             <a href={`/blog/${post.slug}`} class="block overflow-hidden">
               <img
                 src={post.data.image}
@@ -144,8 +179,18 @@ const getCategoryClass = (category: string) =>
                 {post.data.category}
               </span>
               <h3 class="text-xl font-black leading-tight text-white">
-                <a href={`/blog/${post.slug}`} class="hover:text-cyan-300">{post.data.title}</a>
+                <a href={`/blog/${post.slug}`} class="hover:text-primary">{post.data.title}</a>
               </h3>
+              <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+                <span class="inline-flex items-center gap-1.5">
+                  <User className="h-4 w-4" aria-hidden="true" />
+                  {post.data.author}
+                </span>
+                <span class="inline-flex items-center gap-1.5">
+                  <Clock className="h-4 w-4" aria-hidden="true" />
+                  {calculateReadingTime(post.body)}
+                </span>
+              </div>
               <p class="mt-3 text-sm leading-6 text-slate-400">{post.data.description}</p>
             </div>
           </article>
@@ -156,13 +201,23 @@ const getCategoryClass = (category: string) =>
     <section id="latest" class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <div class="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {latestPosts.map((post) => (
-          <article class="rounded-2xl border border-white/10 bg-[#242424] p-5 shadow-lg shadow-black/10">
+          <article class="rounded-2xl border border-white/10 bg-card p-5 shadow-lg shadow-black/10">
             <span class={`mb-3 inline-flex rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wide ${getCategoryClass(post.data.category)}`}>
               {post.data.category}
             </span>
             <h3 class="text-2xl font-black text-white">
-              <a href={`/blog/${post.slug}`} class="hover:text-cyan-300">{post.data.title}</a>
+              <a href={`/blog/${post.slug}`} class="hover:text-primary">{post.data.title}</a>
             </h3>
+            <div class="mt-3 flex flex-wrap items-center gap-3 text-xs text-slate-400">
+              <span class="inline-flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" aria-hidden="true" />
+                {post.data.pubDate.toLocaleDateString("pt-BR")}
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <Clock className="h-4 w-4" aria-hidden="true" />
+                {calculateReadingTime(post.body)}
+              </span>
+            </div>
             <p class="mt-3 text-sm leading-6 text-slate-400">{post.data.description}</p>
           </article>
         ))}
@@ -173,7 +228,7 @@ const getCategoryClass = (category: string) =>
   <footer id="newsletter" class="border-t border-white/10 bg-black/20">
     <div class="mx-auto grid max-w-7xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
       <div>
-        <h2 class="text-2xl font-black">Blogar<span class="text-cyan-400">Style</span></h2>
+        <h2 class="text-2xl font-black">Blogar<span class="text-primary">Style</span></h2>
         <p class="mt-3 text-sm leading-6 text-slate-400">Um template de revista digital em Astro e Tailwind CSS.</p>
       </div>
       <div>
@@ -187,20 +242,29 @@ const getCategoryClass = (category: string) =>
       <div>
         <h3 class="font-bold text-white">Social</h3>
         <ul class="mt-3 space-y-2 text-sm text-slate-400">
-          <li>Instagram</li>
-          <li>YouTube</li>
-          <li>LinkedIn</li>
+          <li class="flex items-center gap-2">
+            <Camera className="h-4 w-4 text-slate-400" aria-hidden="true" />
+            Instagram
+          </li>
+          <li class="flex items-center gap-2">
+            <PlayCircle className="h-4 w-4 text-slate-400" aria-hidden="true" />
+            YouTube
+          </li>
+          <li class="flex items-center gap-2">
+            <Network className="h-4 w-4 text-slate-400" aria-hidden="true" />
+            LinkedIn
+          </li>
         </ul>
       </div>
-      <form class="rounded-2xl bg-[#242424] p-5">
+      <form class="rounded-2xl bg-card p-5">
         <h3 class="font-bold text-white">Receba a newsletter</h3>
         <p class="mt-2 text-sm text-slate-400">Insights semanais direto no seu e-mail.</p>
         <input
           type="email"
           placeholder="seu@email.com"
-          class="mt-4 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400"
+          class="mt-4 w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none focus:border-primary"
         />
-        <button class="mt-3 w-full rounded-xl bg-rose-500 px-4 py-3 text-sm font-black text-white hover:bg-rose-400">
+        <button class="mt-3 w-full rounded-xl bg-accent px-4 py-3 text-sm font-black text-white hover:opacity-90">
           Inscrever
         </button>
       </form>
